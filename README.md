@@ -3,7 +3,7 @@
 ###开发目的
 为了学习DataBinding, RxJava, RxBinding, Retrofit 2.0等知识,参考了[mr-mantou-android](https://github.com/oxoooo/mr-mantou-android)。
 ###截图
-<img src="/app/screenshots/device-2015-11-22-212348.png" width="360" height="640">
+<img src="/screenshots/device-2015-11-23-140931.png" width="384" height="640">
 ###依赖库
 ```
     compile 'com.android.support:appcompat-v7:23.1.0'
