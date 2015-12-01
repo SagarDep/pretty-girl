@@ -24,6 +24,11 @@
 
         <activity android:name=".ui.PictureActivity"
             android:theme="@style/ActivityStyle"/>
+
+        <activity android:name=".ui.AboutActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/about_app"/>
+
     </application>
 
 </manifest>

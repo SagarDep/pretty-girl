@@ -11,8 +11,9 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="2dp"
-        android:background="@android:color/white"
+        android:layout_marginTop="6dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
         android:foreground="?selectableItemBackground">
 
         <me.zsj.pretty_girl.widget.RatioImageView

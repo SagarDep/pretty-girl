@@ -3,4 +3,8 @@
     <color name="colorPrimary">#8D6E63</color>
     <color name="colorPrimaryDark">#795548</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="item_select_color">@android:color/transparent</color>
+    <color name="item_select_normal">#ffffff</color>
+
 </resources>

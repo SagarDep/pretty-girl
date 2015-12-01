@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.jakewharton.rxbinding.view.RxView;
-import com.jakewharton.rxbinding.view.ViewClickEvent;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -83,13 +82,13 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
             imageView = (RatioImageView) itemView.findViewById(R.id.image);
             binding = DataBindingUtil.bind(itemView);
             //防止手抖连续点击图片打开两个页面
-            RxView.clickEvents(imageView)
+            RxView.clicks(imageView)
                     .throttleFirst(1000, TimeUnit.MILLISECONDS)
-                    .subscribe(new Action1<ViewClickEvent>() {
+                    .subscribe(new Action1<Void>() {
                         @Override
-                        public void call(ViewClickEvent viewClickEvent) {
+                        public void call(Void aVoid) {
                             if (onTouchListener != null) {
-                                onTouchListener.onImageTouch(viewClickEvent.view(), girl);
+                                onTouchListener.onImageTouch(imageView, girl);
                             }
                         }
                     });

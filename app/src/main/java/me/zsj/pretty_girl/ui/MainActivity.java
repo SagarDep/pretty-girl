@@ -10,22 +10,18 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.jakewharton.rxbinding.support.v4.widget.RxSwipeRefreshLayout;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.trello.rxlifecycle.ActivityEvent;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,6 +123,7 @@ public class MainActivity extends RxAppCompatActivity {
                         //Log.e("recycler view ", "　is scrolling");
                     }
                 });
+
     }
 
 
@@ -191,7 +188,20 @@ public class MainActivity extends RxAppCompatActivity {
                         mGirlAdapter.notifyDataSetChanged();
                         mRefreshLayout.setRefreshing(false);
                     }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        showError(throwable);
+                    }
                 });
+
+    }
+
+    private void showError(Throwable throwable) {
+        throwable.printStackTrace();
+        mRefreshLayout.setRefreshing(false);
+        Toast.makeText(this, "服务器出错了不能获取数据", Toast.LENGTH_LONG)
+                .show();
     }
 
     @Override
@@ -205,9 +215,12 @@ public class MainActivity extends RxAppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, AboutActivity.class);
+            startActivity(intent);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 }
