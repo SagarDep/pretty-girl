@@ -36,6 +36,7 @@
 * [Retrofit 2.0: The biggest update yet on the best HTTP Client Library for Android](http://inthecheesefactory.com/blog/retrofit-2.0/en)
 * [Data Binding用户指南](http://www.jianshu.com/p/b1df61a4df77)
 * [u2020](https://github.com/JakeWharton/u2020)
+
 ###特别感谢
 * [干货集中营gank.io](http://gank.io/)
 
