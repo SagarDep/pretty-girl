@@ -1,4 +1,4 @@
-package me.zsj.pretty_girl.ui.adapter;
+package me.zsj.pretty_girl.ui;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.jakewharton.rxbinding.view.RxView;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import me.zsj.pretty_girl.R;
 import me.zsj.pretty_girl.databinding.GirlItemBinding;
-import me.zsj.pretty_girl.model.PrettyGirl;
+import me.zsj.pretty_girl.model.Image;
 import me.zsj.pretty_girl.widget.RatioImageView;
 import rx.functions.Action1;
 
@@ -25,14 +26,13 @@ import rx.functions.Action1;
 public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder> {
 
     private Context mContext;
-    private List<PrettyGirl> mPrettyGirlList;
+    private List<Image> mImages;
     private OnTouchListener onTouchListener;
 
-    public GirlAdapter(Context context, List<PrettyGirl> prettyGirlList) {
+    public GirlAdapter(Context context, List<Image> images) {
         this.mContext = context;
-        this.mPrettyGirlList = prettyGirlList;
+        this.mImages = images;
     }
-
 
     public void setOnTouchListener(OnTouchListener onTouchListener) {
         this.onTouchListener = onTouchListener;
@@ -48,26 +48,27 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
     @Override
     public void onBindViewHolder(GirlViewHolder holder, int position) {
 
-        PrettyGirl girl = mPrettyGirlList.get(position);
+        Image image = mImages.get(position);
 
-        holder.girl = girl;
-        holder.binding.setPrettyGirl(girl);
+        holder.image = image;
+        holder.binding.setImage(image);
         holder.binding.executePendingBindings();
 
         Glide.with(mContext)
-                .load(girl.url)
+                .load(image.url)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.imageView);
     }
 
     @Override
     public int getItemViewType(int position) {
-        PrettyGirl girl = mPrettyGirlList.get(position);
-        return Math.round((float) girl.meta.width / (float) girl.meta.height * 10f);
+        Image image = mImages.get(position);
+        return Math.round((float) image.width / (float) image.height * 10f);
     }
 
     @Override
     public int getItemCount() {
-        return mPrettyGirlList.size();
+        return mImages.size();
     }
 
     class GirlViewHolder extends RecyclerView.ViewHolder {
@@ -75,7 +76,7 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
         RatioImageView imageView;
         GirlItemBinding binding;
 
-        PrettyGirl girl;
+        Image image;
 
         public GirlViewHolder(View itemView) {
             super(itemView);
@@ -88,7 +89,7 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
                         @Override
                         public void call(Void aVoid) {
                             if (onTouchListener != null) {
-                                onTouchListener.onImageTouch(imageView, girl);
+                                onTouchListener.onImageClick(imageView, image);
                             }
                         }
                     });
@@ -96,6 +97,6 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
     }
 
     public interface OnTouchListener {
-        void onImageTouch(View v, PrettyGirl girl);
+        void onImageClick(View v, Image image);
     }
 }

@@ -1,7 +1,5 @@
 package me.zsj.pretty_girl.ui;
 
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -28,10 +26,6 @@ public class PictureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(Color.BLACK);
-        }
-
         mImageView = (ImageView) findViewById(R.id.iv_photo);
         mPullBackLayout = (PullBackLayout) findViewById(R.id.pullBackLayout);
 
@@ -50,6 +44,7 @@ public class PictureActivity extends AppCompatActivity {
                 PictureActivity.super.onBackPressed();
             }
         });
+
     }
 
 }

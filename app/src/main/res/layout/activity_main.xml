@@ -28,7 +28,6 @@
 
         </android.support.design.widget.AppBarLayout>
 
-
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/refreshLayout"
             android:layout_width="match_parent"
@@ -39,8 +38,8 @@
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingLeft="3dp"
-                android:paddingRight="3dp">
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp">
             </android.support.v7.widget.RecyclerView>
         </android.support.v4.widget.SwipeRefreshLayout>
 

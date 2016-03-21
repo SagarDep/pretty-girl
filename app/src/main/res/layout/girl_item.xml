@@ -4,24 +4,25 @@
 
     <data>
         <variable
-            name="prettyGirl"
-            type="me.zsj.pretty_girl.model.PrettyGirl"/>
+            name="image"
+            type="me.zsj.pretty_girl.model.Image"/>
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="6dp"
-        android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp"
-        android:foreground="?selectableItemBackground">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:foreground="?selectableItemBackground"
+        android:background="@android:color/white">
 
         <me.zsj.pretty_girl.widget.RatioImageView
             android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scaleType="fitXY"
-            app:originalHeight="@{prettyGirl.meta.height}"
-            app:originalWidth="@{prettyGirl.meta.width}"/>
+            app:originalHeight="@{image.height}"
+            app:originalWidth="@{image.width}"/>
     </FrameLayout>
 </layout>

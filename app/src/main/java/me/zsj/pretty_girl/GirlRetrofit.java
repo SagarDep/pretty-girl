@@ -2,6 +2,8 @@ package me.zsj.pretty_girl;
 
 import com.squareup.okhttp.OkHttpClient;
 
+import java.util.concurrent.TimeUnit;
+
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import retrofit.RxJavaCallAdapterFactory;
@@ -11,13 +13,18 @@ import retrofit.RxJavaCallAdapterFactory;
  */
 public class GirlRetrofit {
 
-    private GirlApi girlApi;
-    private OkHttpClient client = new OkHttpClient();
+    private final GirlApi girlApi;
+    private final OkHttpClient client = new OkHttpClient();
+
+    private static final String GANK_URL = "http://gank.io/api/";
 
     public GirlRetrofit() {
 
+        client.setConnectTimeout(20, TimeUnit.SECONDS);
+        client.setReadTimeout(15, TimeUnit.SECONDS);
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://119.29.45.113:1024/api/")
+                .baseUrl(GANK_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .client(client)

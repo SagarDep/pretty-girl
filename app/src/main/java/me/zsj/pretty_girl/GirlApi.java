@@ -1,10 +1,8 @@
 package me.zsj.pretty_girl;
 
-import java.util.List;
-
-import me.zsj.pretty_girl.model.PrettyGirl;
+import me.zsj.pretty_girl.model.GirlData;
 import retrofit.http.GET;
-import retrofit.http.Query;
+import retrofit.http.Path;
 import rx.Observable;
 
 /**
@@ -12,6 +10,6 @@ import rx.Observable;
  */
 public interface GirlApi {
 
-    @GET("v1/channels/images.json")
-    Observable<List<PrettyGirl>> fetchPrettyGirl(@Query("tags") String tags);
+    @GET("data/福利/20/{page}")
+    Observable<GirlData> fetchPrettyGirl(@Path("page") int page);
 }
