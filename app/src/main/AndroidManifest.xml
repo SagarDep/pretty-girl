@@ -23,7 +23,7 @@
         </activity>
 
         <activity android:name=".ui.PictureActivity"
-            android:theme="@style/ActivityStyle"/>
+            android:theme="@style/PictureTheme"/>
 
         <activity android:name=".ui.AboutActivity"
             android:theme="@style/AppTheme.NoActionBar"

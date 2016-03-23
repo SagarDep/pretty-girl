@@ -1,31 +1,26 @@
 package me.zsj.pretty_girl.widget;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
-
-import me.zsj.pretty_girl.utils.ScreenUtils;
 
 
 /**
  * Created by zsj on 2015/11/1 0001.
+ * reference pull-back-layout
  */
 public class PullBackLayout extends FrameLayout{
 
 
     private ViewDragHelper mDragHelper;
-    private int mReleasedHeight;
     private PullCallBack pullCallBack;
-    private FrameLayout mBackgroudLayout;
-    private ColorDrawable mBackgroud;
+
+    private int mMinimumFlingVelocity;
 
     public void setPullCallBack(PullCallBack pullCallBack) {
         this.pullCallBack = pullCallBack;
@@ -39,8 +34,8 @@ public class PullBackLayout extends FrameLayout{
         super(context, attrs, defStyleAttr);
 
         mDragHelper = ViewDragHelper.create(this, 1f / 8f, new DragCallBack());
-        mReleasedHeight = ScreenUtils.getHeight(context) / 6;
-        mBackgroud = new ColorDrawable(Color.BLACK);
+
+        mMinimumFlingVelocity = ViewConfiguration.get(context).getScaledMinimumFlingVelocity();
 
     }
 
@@ -73,10 +68,19 @@ public class PullBackLayout extends FrameLayout{
         }
 
         @Override
+        public void onViewCaptured(View capturedChild, int activePointerId) {
+            super.onViewCaptured(capturedChild, activePointerId);
+            if (pullCallBack != null) {
+                pullCallBack.onPullStart();
+            }
+        }
+
+        @Override
         public void onViewReleased(View releasedChild, float xvel, float yvel) {
             super.onViewReleased(releasedChild, xvel, yvel);
 
-            if (releasedChild.getTop() >= mReleasedHeight) {
+            int slop = yvel > mMinimumFlingVelocity ? getHeight() / 6 : getHeight() / 3;
+            if (releasedChild.getTop() > slop) {
                 if (pullCallBack != null) {
                     pullCallBack.onPullCompleted();
                 }
@@ -91,16 +95,10 @@ public class PullBackLayout extends FrameLayout{
             super.onViewPositionChanged(changedView, left, top, dx, dy);
 
             float progress = Math.min(1f, ((float)top / (float)getHeight()) * 5f);
-            mBackgroud.setAlpha((int) (0xff * (1f - progress)));
+            if (pullCallBack != null)
+                pullCallBack.onPull(progress);
+            
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        mBackgroudLayout = (FrameLayout) getChildAt(0);
-        mBackgroudLayout.setBackground(mBackgroud);
     }
 
     @Override
@@ -131,6 +129,10 @@ public class PullBackLayout extends FrameLayout{
     }
 
     public interface PullCallBack {
+
+        void onPullStart();
+        
+        void onPull(float progress);
 
         void onPullCompleted();
     }
