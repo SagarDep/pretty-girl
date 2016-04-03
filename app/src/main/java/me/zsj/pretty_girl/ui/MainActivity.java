@@ -36,6 +36,7 @@ import me.zsj.pretty_girl.model.GirlData;
 import me.zsj.pretty_girl.model.Image;
 import me.zsj.pretty_girl.model.PrettyGirl;
 import me.zsj.pretty_girl.utils.NetUtils;
+import retrofit.Result;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
@@ -126,7 +127,7 @@ public class MainActivity extends RxAppCompatActivity {
                     @Override
                     public Boolean call(RecyclerViewScrollEvent recyclerViewScrollEvent) {
                         boolean isBottom = layoutManager.findLastCompletelyVisibleItemPositions(
-                                new int[2])[1] >= mImages.size() - 4;
+                                new int[2])[1] >= mImages.size() - 2;
                         return !mRefreshLayout.isRefreshing() && isBottom;
                     }
                 })
@@ -183,11 +184,10 @@ public class MainActivity extends RxAppCompatActivity {
                 }
             }, 350);
         } else {
-            Snackbar.make(mRecyclerView, "无网络状态不能获取妹纸", Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(mRecyclerView, "无网络状态不能获取美女哦!", Snackbar.LENGTH_INDEFINITE)
                     .setAction("知道了", new View.OnClickListener() {
                         @Override
-                        public void onClick(View v) {
-                        }
+                        public void onClick(View v) {}
                     })
                     .show();
         }
@@ -196,7 +196,7 @@ public class MainActivity extends RxAppCompatActivity {
 
     private void fetchGirlData(final boolean clean) {
         Observable<List<Image>> results = mGirlApi.fetchPrettyGirl(mPage)
-                .compose(this.<GirlData>bindToLifecycle())
+                .compose(this.<Result<GirlData>>bindToLifecycle())
                 .filter(Results.isSuccess())
                 .map(mImageFetcher)
                 .subscribeOn(Schedulers.io())
@@ -222,28 +222,28 @@ public class MainActivity extends RxAppCompatActivity {
 
     }
 
-    private final Func1<GirlData, List<Image>> mImageFetcher =
-            (Func1<GirlData, List<Image>>) new Func1<GirlData, List<Image>>() {
-                @Override
-                public List<Image> call(GirlData data) {
-                    List<PrettyGirl> results = data.results;
-                    for (int i = 0; i < results.size(); i++) {
-                        try {
-                            Bitmap bitmap = Picasso.with(MainActivity.this)
-                                    .load(results.get(i).url)
-                                    .get();
-                            Image image = new Image();
-                            image.width = bitmap.getWidth();
-                            image.height = bitmap.getHeight();
-                            image.url = data.results.get(i).url;
-                            mImages.add(image);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    return mImages;
+    private final Func1<Result<GirlData>, List<Image>> mImageFetcher = new Func1<Result<GirlData>, List<Image>>() {
+        @Override
+        public List<Image> call(Result<GirlData> girlDataResult) {
+            List<PrettyGirl> results = girlDataResult.response().body().results;
+            for (int i = 0; i < results.size(); i++) {
+                try {
+                    Bitmap bitmap = Picasso.with(MainActivity.this)
+                            .load(results.get(i).url)
+                            .get();
+                    Image image = new Image();
+                    image.width = bitmap.getWidth();
+                    image.height = bitmap.getHeight();
+                    image.url =  results.get(i).url;
+                    mImages.add(image);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Observable.error(e);
                 }
-            };
+            }
+            return mImages;
+        }
+    };
 
     private void showError(Throwable throwable) {
         throwable.printStackTrace();

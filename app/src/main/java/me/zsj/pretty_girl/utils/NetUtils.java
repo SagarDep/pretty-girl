@@ -9,7 +9,7 @@ public class NetUtils {
 
     public static boolean checkNet(Context context) {
 
-        boolean mWifiConnected = isWifiConneted(context);
+        boolean mWifiConnected = isWifiConnected(context);
 
         boolean mMobileConnected = isMobileConnected(context);
 
@@ -20,7 +20,7 @@ public class NetUtils {
         return true;
     }
 
-    private static boolean isWifiConneted(Context context) {
+    private static boolean isWifiConnected(Context context) {
 
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(
                 Context.CONNECTIVITY_SERVICE);

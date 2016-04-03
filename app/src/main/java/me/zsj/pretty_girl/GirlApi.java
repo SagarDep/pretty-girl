@@ -1,6 +1,7 @@
 package me.zsj.pretty_girl;
 
 import me.zsj.pretty_girl.model.GirlData;
+import retrofit.Result;
 import retrofit.http.GET;
 import retrofit.http.Path;
 import rx.Observable;
@@ -11,5 +12,5 @@ import rx.Observable;
 public interface GirlApi {
 
     @GET("data/福利/20/{page}")
-    Observable<GirlData> fetchPrettyGirl(@Path("page") int page);
+    Observable<Result<GirlData>> fetchPrettyGirl(@Path("page") int page);
 }
