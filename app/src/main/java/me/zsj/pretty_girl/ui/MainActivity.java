@@ -43,7 +43,6 @@ import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 
 public class MainActivity extends RxAppCompatActivity {
@@ -52,8 +51,6 @@ public class MainActivity extends RxAppCompatActivity {
     private RecyclerView mRecyclerView;
     private GirlAdapter mGirlAdapter;
     private List<Image> mImages = new ArrayList<>();
-
-    private CompositeSubscription mSubscription = new CompositeSubscription();
 
     @Inject GirlApi mGirlApi;
     private int mPage = 1;
@@ -81,10 +78,10 @@ public class MainActivity extends RxAppCompatActivity {
         /**
          * 相当于这样的写法
          * mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override public void onRefresh() {
+        @Override public void onRefresh() {
 
-                    }
-                });
+        }
+        });
          */
         RxSwipeRefreshLayout.refreshes(mRefreshLayout)
                 .compose(this.<Void>bindToLifecycle())
@@ -112,15 +109,15 @@ public class MainActivity extends RxAppCompatActivity {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mGirlAdapter);
 
+
         /**
-         * 相当于这样的写法
-         * mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                        super.onScrolled(recyclerView, dx, dy);
-        }
-        });
-         */
+        相当于这样的写法
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });*/
         RxRecyclerView.scrollEvents(mRecyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindUntilEvent(ActivityEvent.DESTROY))
                 .filter(new Func1<RecyclerViewScrollEvent, Boolean>() {
@@ -165,8 +162,7 @@ public class MainActivity extends RxAppCompatActivity {
                     }
 
                     @Override
-                    public void onError() {
-                    }
+                    public void onError() {}
                 });
             }
         });
@@ -180,77 +176,76 @@ public class MainActivity extends RxAppCompatActivity {
                 @Override
                 public void run() {
                     mRefreshLayout.setRefreshing(true);
-                    fetchGirlData(false);
                 }
             }, 350);
         } else {
             Snackbar.make(mRecyclerView, "无网络状态不能获取美女哦!", Snackbar.LENGTH_INDEFINITE)
                     .setAction("知道了", new View.OnClickListener() {
                         @Override
-                        public void onClick(View v) {}
+                        public void onClick(View v) {
+                        }
                     })
                     .show();
         }
-
+        fetchGirlData(false);
     }
 
     private void fetchGirlData(final boolean clean) {
         Observable<List<Image>> results = mGirlApi.fetchPrettyGirl(mPage)
                 .compose(this.<Result<GirlData>>bindToLifecycle())
                 .filter(Results.isSuccess())
-                .map(mImageFetcher)
+                .map(new Func1<Result<GirlData>, GirlData>() {
+                    @Override
+                    public GirlData call(Result<GirlData> girlDataResult) {
+                        return girlDataResult.response().body();
+                    }
+                })
+                .flatMap(imageFetcher)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .share();
 
-        mSubscription.add(results
-                .compose(this.<List<Image>>bindToLifecycle())
-                .filter(Results.isNull())
-                .subscribe(new Action1<List<Image>>() {
+        results.filter(Results.isNull())
+                .doOnNext(new Action1<List<Image>>() {
                     @Override
                     public void call(List<Image> images) {
                         if (clean) images.clear();
                         mRefreshLayout.setRefreshing(false);
-                        mGirlAdapter.notifyDataSetChanged();
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        showError(throwable);
-                    }
-                }));
-
+                })
+                .subscribe(mGirlAdapter, dataError);
     }
 
-    private final Func1<Result<GirlData>, List<Image>> mImageFetcher = new Func1<Result<GirlData>, List<Image>>() {
+    private final Func1<GirlData, Observable<List<Image>>> imageFetcher = new Func1<GirlData, Observable<List<Image>>>() {
         @Override
-        public List<Image> call(Result<GirlData> girlDataResult) {
-            List<PrettyGirl> results = girlDataResult.response().body().results;
+        public Observable<List<Image>> call(GirlData girlData) {
+            List<PrettyGirl> results = girlData.results;
             for (int i = 0; i < results.size(); i++) {
                 try {
-                    Bitmap bitmap = Picasso.with(MainActivity.this)
-                            .load(results.get(i).url)
+                    Bitmap bitmap = Picasso.with(MainActivity.this).load(results.get(i).url)
                             .get();
                     Image image = new Image();
                     image.width = bitmap.getWidth();
                     image.height = bitmap.getHeight();
-                    image.url =  results.get(i).url;
+                    image.url = results.get(i).url;
                     mImages.add(image);
-                } catch (IOException e) {
+                }catch (IOException e) {
                     e.printStackTrace();
-                    Observable.error(e);
                 }
             }
-            return mImages;
+            return Observable.just(mImages);
         }
     };
 
-    private void showError(Throwable throwable) {
-        throwable.printStackTrace();
-        mRefreshLayout.setRefreshing(false);
-        Snackbar.make(mRecyclerView, throwable.getMessage(), Snackbar.LENGTH_LONG)
-                .show();
-    }
+    private Action1<Throwable> dataError = new Action1<Throwable>() {
+        @Override
+        public void call(Throwable throwable) {
+            throwable.printStackTrace();
+            mRefreshLayout.setRefreshing(false);
+            Snackbar.make(mRecyclerView, throwable.getMessage(), Snackbar.LENGTH_LONG)
+                    .show();
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -261,7 +256,6 @@ public class MainActivity extends RxAppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, AboutActivity.class);
             startActivity(intent);
@@ -271,9 +265,4 @@ public class MainActivity extends RxAppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mSubscription.unsubscribe();
-    }
 }

@@ -8,4 +8,5 @@ import me.zsj.pretty_girl.ui.MainActivity;
 public interface GirlGraph {
 
     void inject(MainActivity mainActivity);
+
 }

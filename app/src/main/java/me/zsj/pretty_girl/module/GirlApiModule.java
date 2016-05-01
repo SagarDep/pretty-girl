@@ -14,7 +14,8 @@ import me.zsj.pretty_girl.GirlRetrofit;
 @Module
 public class GirlApiModule {
 
-    @Provides @Singleton GirlApi provideGirlApi() {
+    @Provides @Singleton
+    public GirlApi provideGirlApi() {
         return new GirlRetrofit().getGirlApi();
     }
 }
