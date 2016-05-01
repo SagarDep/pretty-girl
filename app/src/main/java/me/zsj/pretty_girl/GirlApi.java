@@ -11,6 +11,6 @@ import rx.Observable;
  */
 public interface GirlApi {
 
-    @GET("data/福利/20/{page}")
+    @GET("data/福利/10/{page}")
     Observable<Result<GirlData>> fetchPrettyGirl(@Path("page") int page);
 }

@@ -23,7 +23,8 @@ import rx.functions.Action1;
 /**
  * Created by zsj on 2015/11/20 0020.
  */
-public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder> {
+public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder>
+        implements Action1<List<Image>> {
 
     private Context mContext;
     private List<Image> mImages;
@@ -69,6 +70,11 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
     @Override
     public int getItemCount() {
         return mImages.size();
+    }
+
+    @Override
+    public void call(List<Image> images) {
+        notifyDataSetChanged();
     }
 
     class GirlViewHolder extends RecyclerView.ViewHolder {
