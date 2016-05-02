@@ -61,12 +61,12 @@ public class MainActivity extends RxAppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        GirlApiComponent.Initializer.init().inject(this);
-
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.refreshLayout);
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        GirlApiComponent.Initializer.init().inject(this);
 
         swipeRefresh();
         setupRecyclerView();
@@ -85,18 +85,11 @@ public class MainActivity extends RxAppCompatActivity {
          */
         RxSwipeRefreshLayout.refreshes(mRefreshLayout)
                 .compose(this.<Void>bindToLifecycle())
-                .doOnCompleted(new Action0() {
-                    @Override
-                    public void call() {
-                        mRefreshLayout.setRefreshing(false);
-                    }
-                })
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
                         mPage = 1;
                         refreshing = true;
-                        mRefreshLayout.setRefreshing(true);
                         fetchGirlData(true);
                     }
                 });
@@ -171,19 +164,12 @@ public class MainActivity extends RxAppCompatActivity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        if (NetUtils.checkNet(this)) {
-            mRecyclerView.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mRefreshLayout.setRefreshing(true);
-                }
-            }, 350);
-        } else {
+
+        if (!NetUtils.checkNet(this)){
             Snackbar.make(mRecyclerView, "无网络状态不能获取美女哦!", Snackbar.LENGTH_INDEFINITE)
                     .setAction("知道了", new View.OnClickListener() {
                         @Override
-                        public void onClick(View v) {
-                        }
+                        public void onClick(View v) {}
                     })
                     .show();
         }
@@ -210,6 +196,11 @@ public class MainActivity extends RxAppCompatActivity {
                     @Override
                     public void call(List<Image> images) {
                         if (clean) images.clear();
+                    }
+                })
+                .doOnCompleted(new Action0() {
+                    @Override
+                    public void call() {
                         mRefreshLayout.setRefreshing(false);
                     }
                 })
