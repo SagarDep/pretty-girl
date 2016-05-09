@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">美丽女孩</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="about_app">关于</string>
+    <string name="source_code_name">Assassinss / pretty-girl</string>
+    <string name="source_code_address_declare">项目源代码的github 地址</string>
+
+    <string name="thanks">感谢</string>
+    <string name="gankio">干货集中营提供Api</string>
+</resources>
