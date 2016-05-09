@@ -18,7 +18,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 /**
  * Created by zsj on 2015/11/21 0021.
  */
-public class PictureActivity extends AppCompatActivity implements PullBackLayout.PullCallBack{
+public class PictureActivity extends AppCompatActivity implements PullBackLayout.PullCallBack {
 
     private String mGirlUrl;
     private ImageView mImageView;
@@ -57,7 +57,7 @@ public class PictureActivity extends AppCompatActivity implements PullBackLayout
                 if (mSystemUiShow) {
                     hideSystemUI();
                     mSystemUiShow = false;
-                }else {
+                } else {
                     showSystemUI();
                     mSystemUiShow = true;
                 }

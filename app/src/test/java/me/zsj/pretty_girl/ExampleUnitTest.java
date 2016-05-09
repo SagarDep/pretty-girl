@@ -1,5 +1,3 @@
-package me.zsj.pretty_girl;
-
 import org.junit.Test;
 
 import static org.junit.Assert.*;

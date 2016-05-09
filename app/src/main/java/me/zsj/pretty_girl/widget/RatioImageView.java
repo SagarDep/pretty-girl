@@ -45,8 +45,7 @@ public class RatioImageView extends ImageView {
             }
 
             setMeasuredDimension(width, height);
-        }
-        else {
+        } else {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         }
     }
