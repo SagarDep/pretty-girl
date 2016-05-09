@@ -101,7 +101,7 @@ public class MainActivity extends RxAppCompatActivity {
         int spanCount = 2;
         if (ConfigurationUtils.isOrientationPortrait(this)) {
             spanCount = 2;
-        }else if (ConfigurationUtils.isOrientationLanscape(this)) {
+        }else if (ConfigurationUtils.isOrientationLandscape(this)) {
             spanCount = 3;
         }
         final StaggeredGridLayoutManager layoutManager =
@@ -128,7 +128,7 @@ public class MainActivity extends RxAppCompatActivity {
                         if (ConfigurationUtils.isOrientationPortrait(MainActivity.this)) {
                             isBottom = layoutManager.findLastCompletelyVisibleItemPositions(
                                     new int[2])[1] >= mImages.size() - 2;
-                        }else if (ConfigurationUtils.isOrientationLanscape(MainActivity.this)) {
+                        }else if (ConfigurationUtils.isOrientationLandscape(MainActivity.this)) {
                             isBottom = layoutManager.findLastCompletelyVisibleItemPositions(
                                     new int[3])[2] >= mImages.size() - 2;
                         }

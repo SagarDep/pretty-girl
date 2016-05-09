@@ -16,7 +16,7 @@ public class ConfigurationUtils {
         return false;
     }
 
-    public static boolean isOrientationLanscape(Context context) {
+    public static boolean isOrientationLandscape(Context context) {
         if (context.getResources().getConfiguration().orientation ==
                 Configuration.ORIENTATION_LANDSCAPE) {
             return true;
