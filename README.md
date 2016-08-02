@@ -3,9 +3,9 @@
 ###开发目的
 为了学习DataBinding, RxJava, RxBinding, Retrofit 2.0等知识,参考了[mr-mantou-android](https://github.com/oxoooo/mr-mantou-android)。
 ###截图
-<img src="/screenshots%2Fenframe_2016-03-20-21-42-07.png" width="282" height="476">
-<img src="/screenshots%2Fenframe_2016-03-21-21-40-46.png" width="282" height="476">
-<img src="/screenshots%2Fenframe_2016-05-09-17-41-18.png" width="476" height="282">
+<img src="/screenshots/device-2016-05-22-190624.png" width="239" height="481">
+<img src="/screenshots/device-2016-05-22-190753.png" width="274" height="489">
+<img src="/screenshots/device-2016-05-22-190900.png" width="499" height="246">
 
 
 ###依赖库
