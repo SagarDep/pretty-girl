@@ -35,7 +35,7 @@ import me.zsj.pretty_girl.Results;
 import me.zsj.pretty_girl.model.GirlData;
 import me.zsj.pretty_girl.model.Image;
 import me.zsj.pretty_girl.model.PrettyGirl;
-import me.zsj.pretty_girl.utils.ConfigurationUtils;
+import me.zsj.pretty_girl.utils.ConfigUtils;
 import me.zsj.pretty_girl.utils.NetUtils;
 import retrofit.Result;
 import rx.Observable;
@@ -47,26 +47,27 @@ import rx.schedulers.Schedulers;
 
 public class MainActivity extends RxAppCompatActivity {
 
-    private SwipeRefreshLayout mRefreshLayout;
-    private RecyclerView mRecyclerView;
-    private Toolbar mToolbar;
+    private SwipeRefreshLayout refreshLayout;
+    private RecyclerView recyclerView;
+    private Toolbar toolbar;
 
-    private GirlAdapter mGirlAdapter;
+    private GirlAdapter girlAdapter;
     private List<Image> mImages = new ArrayList<>();
 
-    @Inject GirlApi mGirlApi;
-    private int mPage = 1;
+    @Inject GirlApi girlApi;
+    private int page = 1;
     private boolean refreshing;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.refreshLayout);
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refreshLayout);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         GirlApiComponent.Initializer.init().inject(this);
 
@@ -77,79 +78,63 @@ public class MainActivity extends RxAppCompatActivity {
     }
 
     private void flyToTop() {
-        RxView.clicks(mToolbar)
+        RxView.clicks(toolbar)
+                .compose(this.bindToLifecycle())
                 .subscribe(aVoid -> {
-                    mRecyclerView.smoothScrollToPosition(0);
+                    recyclerView.smoothScrollToPosition(0);
                 });
     }
 
     private void swipeRefresh() {
-        /**
-         * 相当于这样的写法
-         * mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-        @Override public void onRefresh() {
-
-        }
-        });
-         */
-        RxSwipeRefreshLayout.refreshes(mRefreshLayout)
+        RxSwipeRefreshLayout.refreshes(refreshLayout)
                 .compose(this.<Void>bindToLifecycle())
                 .subscribe(aVoid -> {
-                    mPage = 1;
+                    page = 1;
                     refreshing = true;
                     fetchGirlData(true);
                 });
     }
 
     private void setupRecyclerView() {
-        mGirlAdapter = new GirlAdapter(this, mImages);
+        girlAdapter = new GirlAdapter(this, mImages);
         int spanCount = 2;
-        if (ConfigurationUtils.isOrientationPortrait(this)) spanCount = 2;
-        else if (ConfigurationUtils.isOrientationLandscape(this)) spanCount = 3;
+        if (ConfigUtils.isOrientationPortrait(this)) spanCount = 2;
+        else if (ConfigUtils.isOrientationLandscape(this)) spanCount = 3;
 
         final StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(
                 spanCount, StaggeredGridLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(mGirlAdapter);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(girlAdapter);
 
-
-        /**
-        相当于这样的写法
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-            }
-        });*/
-        RxRecyclerView.scrollEvents(mRecyclerView)
+        RxRecyclerView.scrollEvents(recyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindUntilEvent(ActivityEvent.DESTROY))
                 .filter(recyclerViewScrollEvent -> {
                     boolean isBottom = false;
-                    if (ConfigurationUtils.isOrientationPortrait(MainActivity.this)) {
+                    if (ConfigUtils.isOrientationPortrait(this)) {
                         isBottom = layoutManager.findLastCompletelyVisibleItemPositions(
                                 new int[2])[1] >= mImages.size() - 4;
-                    }else if (ConfigurationUtils.isOrientationLandscape(MainActivity.this)) {
+                    } else if (ConfigUtils.isOrientationLandscape(this)) {
                         isBottom = layoutManager.findLastCompletelyVisibleItemPositions(
                                 new int[3])[2] >= mImages.size() - 4;
                     }
-                    return !mRefreshLayout.isRefreshing() && isBottom;
+                    return !refreshLayout.isRefreshing() && isBottom;
                 })
                 .subscribe(recyclerViewScrollEvent ->{
-                    //这么做的目的是一旦下拉刷新，RxRecyclerView scrollEvents 也会被触发，mPage就会加一
-                    //所以要将mPage设为0，这样下拉刷新才能获取第一页的数据
+                    //这么做的目的是一旦下拉刷新，RxRecyclerView scrollEvents 也会被触发，page就会加一
+                    //所以要将page设为0，这样下拉刷新才能获取第一页的数据
                     if (refreshing) {
-                        mPage = 0;
+                        page = 0;
                         refreshing = false;
                     }
-                    mPage += 1;
-                    mRefreshLayout.setRefreshing(true);
+                    page += 1;
+                    refreshLayout.setRefreshing(true);
                     fetchGirlData(false);
                 });
 
     }
 
     private void onImageClick() {
-        mGirlAdapter.setOnTouchListener((v, image) ->
+        girlAdapter.setOnTouchListener((v, image) ->
                 Picasso.with(MainActivity.this).load(image.url).fetch(new Callback() {
                     @Override
                     public void onSuccess() {
@@ -171,7 +156,7 @@ public class MainActivity extends RxAppCompatActivity {
         super.onPostCreate(savedInstanceState);
 
         if (!NetUtils.checkNet(this)){
-            Snackbar.make(mRecyclerView, "无网络不能获取美女哦!", Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(recyclerView, "无网络不能获取美女哦!", Snackbar.LENGTH_INDEFINITE)
                     .setAction("知道了", v -> {})
                     .show();
         }
@@ -179,21 +164,21 @@ public class MainActivity extends RxAppCompatActivity {
     }
 
     private void fetchGirlData(final boolean clean) {
-        Observable<List<Image>> results = mGirlApi.fetchPrettyGirl(mPage)
+        Observable<List<Image>> results = girlApi.fetchPrettyGirl(page)
                 .compose(this.<Result<GirlData>>bindToLifecycle())
                 .filter(Results.isSuccess())
                 .map(girlDataResult -> girlDataResult.response().body())
                 .flatMap(imageFetcher)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .share();
+                .cache();
 
         results.filter(Results.isNull())
                 .doOnNext(images -> {
                     if (clean) images.clear();
                 })
-                .doOnCompleted(() -> mRefreshLayout.setRefreshing(false))
-                .subscribe(mGirlAdapter, dataError);
+                .doOnCompleted(() -> refreshLayout.setRefreshing(false))
+                .subscribe(girlAdapter, dataError);
     }
 
     private final Func1<GirlData, Observable<List<Image>>> imageFetcher = girlData -> {
@@ -219,8 +204,8 @@ public class MainActivity extends RxAppCompatActivity {
         @Override
         public void call(Throwable throwable) {
             throwable.printStackTrace();
-            mRefreshLayout.setRefreshing(false);
-            Snackbar.make(mRecyclerView, throwable.getMessage(), Snackbar.LENGTH_LONG)
+            refreshLayout.setRefreshing(false);
+            Snackbar.make(recyclerView, throwable.getMessage(), Snackbar.LENGTH_LONG)
                     .show();
         }
     };

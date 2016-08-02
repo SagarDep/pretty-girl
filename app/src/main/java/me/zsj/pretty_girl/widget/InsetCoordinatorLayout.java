@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowInsets;
 
 import me.zsj.pretty_girl.R;
@@ -42,19 +41,26 @@ public class InsetCoordinatorLayout extends CoordinatorLayout implements View.On
 
     @Override
     public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
-        int windowInsetRight = insets.getSystemWindowInsetRight();
 
-        ViewGroup.MarginLayoutParams lpToolbar = (ViewGroup.MarginLayoutParams) toolbar.getLayoutParams();
-        lpToolbar.topMargin += insets.getSystemWindowInsetTop();
-        lpToolbar.rightMargin += windowInsetRight;
-        toolbar.setLayoutParams(lpToolbar);
+        int l = insets.getSystemWindowInsetLeft();
+        int t = insets.getSystemWindowInsetTop();
+        int r = insets.getSystemWindowInsetRight();
+        int b = insets.getSystemWindowInsetBottom();
+        toolbar.setPadding(l, t, 0, 0);
 
-        recyclerView.setPadding(recyclerView.getPaddingLeft(),
+        recyclerView.setPaddingRelative(recyclerView.getPaddingLeft() + l,
                 recyclerView.getPaddingTop(),
-                recyclerView.getPaddingRight() + windowInsetRight,
-                recyclerView.getPaddingBottom());
+                recyclerView.getPaddingRight(),
+                recyclerView.getPaddingBottom() + b);
+
+        final boolean ltr = recyclerView.getLayoutDirection() == View.LAYOUT_DIRECTION_LTR;
+
+        setPadding(getPaddingLeft(), getPaddingTop(), getPaddingEnd() + (ltr ? r : 0),
+                getPaddingBottom()
+        );
 
         setOnApplyWindowInsetsListener(null);
         return insets.consumeSystemWindowInsets();
     }
+
 }

@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -33,6 +34,7 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
     public GirlAdapter(Context context, List<Image> images) {
         this.mContext = context;
         this.mImages = images;
+        setHasStableIds(true);
     }
 
     public void setOnTouchListener(OnTouchListener onTouchListener) {
@@ -79,6 +81,7 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
 
     class GirlViewHolder extends RecyclerView.ViewHolder {
 
+        FrameLayout girlLayout;
         RatioImageView imageView;
         GirlItemBinding binding;
 
@@ -87,16 +90,14 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
         public GirlViewHolder(View itemView) {
             super(itemView);
             imageView = (RatioImageView) itemView.findViewById(R.id.image);
+            girlLayout = (FrameLayout) itemView.findViewById(R.id.girl_layout);
             binding = DataBindingUtil.bind(itemView);
-            //防止手抖连续点击图片打开两个页面
-            RxView.clicks(imageView)
+            //防止手抖连续点击图片打开多个页面
+            RxView.clicks(girlLayout)
                     .throttleFirst(1000, TimeUnit.MILLISECONDS)
-                    .subscribe(new Action1<Void>() {
-                        @Override
-                        public void call(Void aVoid) {
-                            if (onTouchListener != null) {
-                                onTouchListener.onImageClick(imageView, image);
-                            }
+                    .subscribe(aVoid -> {
+                        if (onTouchListener != null) {
+                            onTouchListener.onImageClick(imageView, image);
                         }
                     });
         }
