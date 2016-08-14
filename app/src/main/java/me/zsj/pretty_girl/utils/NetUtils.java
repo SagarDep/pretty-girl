@@ -8,7 +8,6 @@ import android.net.NetworkInfo;
 public class NetUtils {
 
     public static boolean checkNet(Context context) {
-
         boolean mWifiConnected = isWifiConnected(context);
 
         boolean mMobileConnected = isMobileConnected(context);
@@ -21,7 +20,6 @@ public class NetUtils {
     }
 
     private static boolean isWifiConnected(Context context) {
-
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(
                 Context.CONNECTIVITY_SERVICE);
 
@@ -35,7 +33,6 @@ public class NetUtils {
     }
 
     private static boolean isMobileConnected(Context context) {
-
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(
                 Context.CONNECTIVITY_SERVICE);
 

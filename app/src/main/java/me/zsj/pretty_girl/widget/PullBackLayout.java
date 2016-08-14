@@ -16,7 +16,6 @@ import android.widget.FrameLayout;
  */
 public class PullBackLayout extends FrameLayout{
 
-
     private ViewDragHelper mDragHelper;
     private PullCallBack pullCallBack;
 
@@ -25,6 +24,7 @@ public class PullBackLayout extends FrameLayout{
     public void setPullCallBack(PullCallBack pullCallBack) {
         this.pullCallBack = pullCallBack;
     }
+
 
     public PullBackLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -36,7 +36,6 @@ public class PullBackLayout extends FrameLayout{
         mDragHelper = ViewDragHelper.create(this, 1f / 8f, new DragCallBack());
 
         mMinimumFlingVelocity = ViewConfiguration.get(context).getScaledMinimumFlingVelocity();
-
     }
 
 
@@ -78,7 +77,6 @@ public class PullBackLayout extends FrameLayout{
         @Override
         public void onViewReleased(View releasedChild, float xvel, float yvel) {
             super.onViewReleased(releasedChild, xvel, yvel);
-
             int slop = yvel > mMinimumFlingVelocity ? getHeight() / 6 : getHeight() / 3;
             if (releasedChild.getTop() > slop) {
                 if (pullCallBack != null) {
@@ -93,7 +91,6 @@ public class PullBackLayout extends FrameLayout{
         @Override
         public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
             super.onViewPositionChanged(changedView, left, top, dx, dy);
-
             float progress = Math.min(1f, ((float)top / (float)getHeight()) * 5f);
             if (pullCallBack != null)
                 pullCallBack.onPull(progress);
@@ -111,7 +108,6 @@ public class PullBackLayout extends FrameLayout{
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-
         //这么做的目的是当图片缩小时应用会发生下标越界异常，
         // 接着捕捉异常返回false，子View可以继续处理事件分发，应用就不会crash了
         try {

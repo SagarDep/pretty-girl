@@ -63,7 +63,6 @@ public class MainActivity extends RxAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refreshLayout);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -130,7 +129,6 @@ public class MainActivity extends RxAppCompatActivity {
                     refreshLayout.setRefreshing(true);
                     fetchGirlData(false);
                 });
-
     }
 
     private void onImageClick() {
@@ -154,7 +152,6 @@ public class MainActivity extends RxAppCompatActivity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-
         if (!NetUtils.checkNet(this)){
             Snackbar.make(recyclerView, "无网络不能获取美女哦!", Snackbar.LENGTH_INDEFINITE)
                     .setAction("知道了", v -> {})
@@ -224,7 +221,6 @@ public class MainActivity extends RxAppCompatActivity {
             startActivity(intent);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

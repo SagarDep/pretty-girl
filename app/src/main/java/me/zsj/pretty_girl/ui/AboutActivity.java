@@ -20,27 +20,24 @@ import me.zsj.pretty_girl.R;
  */
 public class AboutActivity extends RxAppCompatActivity {
 
-    private FrameLayout mProjectCard;
-    private FrameLayout mGankCard;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
-
-        mProjectCard = (FrameLayout) findViewById(R.id.card_view);
-        mGankCard = (FrameLayout) findViewById(R.id.card_gankio);
+        FrameLayout projectCard = (FrameLayout) findViewById(R.id.card_view);
+        FrameLayout gankCard = (FrameLayout) findViewById(R.id.card_gankio);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         RxToolbar.navigationClicks(toolbar)
                 .compose(this.<Void>bindToLifecycle())
                 .subscribe(aVoid -> {
                     AboutActivity.this.onBackPressed();
                 });
 
-        RxView.clicks(mProjectCard)
+        RxView.clicks(projectCard)
                 .throttleFirst(1000, TimeUnit.MILLISECONDS)
                 .compose(this.<Void>bindToLifecycle())
                 .subscribe(aVoid -> {
@@ -50,7 +47,7 @@ public class AboutActivity extends RxAppCompatActivity {
                     startActivity(intent);
                 });
 
-        RxView.clicks(mGankCard)
+        RxView.clicks(gankCard)
                 .throttleFirst(1000, TimeUnit.MILLISECONDS)
                 .compose(this.<Void>bindToLifecycle())
                 .subscribe(aVoid -> {

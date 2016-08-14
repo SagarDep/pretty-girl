@@ -12,6 +12,7 @@ public class RatioImageView extends ImageView {
     private int originalWidth;
     private int originalHeight;
 
+
     public RatioImageView(Context context) {
         super(context);
     }

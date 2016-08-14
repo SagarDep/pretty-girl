@@ -34,7 +34,6 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
     public GirlAdapter(Context context, List<Image> images) {
         this.mContext = context;
         this.mImages = images;
-        setHasStableIds(true);
     }
 
     public void setOnTouchListener(OnTouchListener onTouchListener) {
@@ -50,7 +49,6 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
 
     @Override
     public void onBindViewHolder(GirlViewHolder holder, int position) {
-
         Image image = mImages.get(position);
 
         holder.image = image;
@@ -80,7 +78,6 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
     }
 
     class GirlViewHolder extends RecyclerView.ViewHolder {
-
         FrameLayout girlLayout;
         RatioImageView imageView;
         GirlItemBinding binding;

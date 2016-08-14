@@ -14,12 +14,12 @@ import retrofit.RxJavaCallAdapterFactory;
 public class GirlRetrofit {
 
     private final GirlApi girlApi;
-    private final OkHttpClient client = new OkHttpClient();
 
     private static final String GANK_URL = "http://gank.io/api/";
 
-    public GirlRetrofit() {
 
+    public GirlRetrofit() {
+        OkHttpClient client = new OkHttpClient();
         client.setConnectTimeout(20, TimeUnit.SECONDS);
         client.setReadTimeout(15, TimeUnit.SECONDS);
 

@@ -41,7 +41,6 @@ public class InsetCoordinatorLayout extends CoordinatorLayout implements View.On
 
     @Override
     public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
-
         int l = insets.getSystemWindowInsetLeft();
         int t = insets.getSystemWindowInsetTop();
         int r = insets.getSystemWindowInsetRight();
