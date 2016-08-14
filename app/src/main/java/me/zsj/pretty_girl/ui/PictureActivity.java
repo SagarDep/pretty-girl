@@ -20,11 +20,6 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  */
 public class PictureActivity extends AppCompatActivity implements PullBackLayout.PullCallBack {
 
-    private String mGirlUrl;
-    private ImageView mImageView;
-    private PhotoViewAttacher mViewAttacher;
-    private PullBackLayout mPullBackLayout;
-
     private boolean mSystemUiShow = true;
     private ColorDrawable background;
 
@@ -32,38 +27,33 @@ public class PictureActivity extends AppCompatActivity implements PullBackLayout
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_picture);
+        ImageView meiziPhoto = (ImageView) findViewById(R.id.iv_photo);
+        PullBackLayout pullBackLayout = (PullBackLayout) findViewById(R.id.pullBackLayout);
 
-        mImageView = (ImageView) findViewById(R.id.iv_photo);
-        mPullBackLayout = (PullBackLayout) findViewById(R.id.pullBackLayout);
+        String mGirlUrl = getIntent().getExtras().getString("url");
 
-        mGirlUrl = getIntent().getExtras().getString("url");
-
-        ViewCompat.setTransitionName(mImageView, "girl");
+        ViewCompat.setTransitionName(meiziPhoto, "girl");
 
         Picasso.with(this).load(mGirlUrl)
-                .into(mImageView);
+                .into(meiziPhoto);
 
         background = new ColorDrawable(Color.BLACK);
 
-        mPullBackLayout.getRootView().setBackground(background);
+        pullBackLayout.getRootView().setBackground(background);
 
-        mViewAttacher = new PhotoViewAttacher(mImageView);
+        PhotoViewAttacher mViewAttacher = new PhotoViewAttacher(meiziPhoto);
 
-        mPullBackLayout.setPullCallBack(this);
+        pullBackLayout.setPullCallBack(this);
 
-        mViewAttacher.setOnViewTapListener(new PhotoViewAttacher.OnViewTapListener() {
-            @Override
-            public void onViewTap(View view, float x, float y) {
-                if (mSystemUiShow) {
-                    hideSystemUI();
-                    mSystemUiShow = false;
-                } else {
-                    showSystemUI();
-                    mSystemUiShow = true;
-                }
+        mViewAttacher.setOnViewTapListener((view, x, y) -> {
+            if (mSystemUiShow) {
+                hideSystemUI();
+                mSystemUiShow = false;
+            } else {
+                showSystemUI();
+                mSystemUiShow = true;
             }
         });
-
     }
 
     @Override

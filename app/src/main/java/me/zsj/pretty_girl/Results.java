@@ -18,7 +18,7 @@ public class Results {
     }
 
     public static Func1<List<?>, Boolean> IMAGE_FUNC =
-            images -> images.size() != 0 && images != null;
+            images -> images.size() != 0;
 
     public static Func1<List<?>, Boolean> isNull() {
         return IMAGE_FUNC;
