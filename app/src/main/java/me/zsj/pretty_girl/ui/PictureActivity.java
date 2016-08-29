@@ -20,7 +20,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  */
 public class PictureActivity extends AppCompatActivity implements PullBackLayout.PullCallBack {
 
-    private boolean mSystemUiShow = true;
+    private boolean systemUiIsShow = true;
     private ColorDrawable background;
 
     @Override
@@ -46,12 +46,12 @@ public class PictureActivity extends AppCompatActivity implements PullBackLayout
         pullBackLayout.setPullCallBack(this);
 
         mViewAttacher.setOnViewTapListener((view, x, y) -> {
-            if (mSystemUiShow) {
+            if (systemUiIsShow) {
                 hideSystemUI();
-                mSystemUiShow = false;
+                systemUiIsShow = false;
             } else {
                 showSystemUI();
-                mSystemUiShow = true;
+                systemUiIsShow = true;
             }
         });
     }

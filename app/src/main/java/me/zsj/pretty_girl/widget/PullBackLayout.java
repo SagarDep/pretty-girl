@@ -16,7 +16,7 @@ import android.widget.FrameLayout;
  */
 public class PullBackLayout extends FrameLayout{
 
-    private ViewDragHelper mDragHelper;
+    private ViewDragHelper dragHelper;
     private PullCallBack pullCallBack;
 
     private int mMinimumFlingVelocity;
@@ -33,7 +33,7 @@ public class PullBackLayout extends FrameLayout{
     public PullBackLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        mDragHelper = ViewDragHelper.create(this, 1f / 8f, new DragCallBack());
+        dragHelper = ViewDragHelper.create(this, 1f / 8f, new DragCallBack());
 
         mMinimumFlingVelocity = ViewConfiguration.get(context).getScaledMinimumFlingVelocity();
     }
@@ -83,7 +83,7 @@ public class PullBackLayout extends FrameLayout{
                     pullCallBack.onPullCompleted();
                 }
             }else {
-                mDragHelper.settleCapturedViewAt(0, 0);
+                dragHelper.settleCapturedViewAt(0, 0);
                 invalidate();
             }
         }
@@ -101,7 +101,7 @@ public class PullBackLayout extends FrameLayout{
     @Override
     public void computeScroll() {
         super.computeScroll();
-        if (mDragHelper.continueSettling(true)) {
+        if (dragHelper.continueSettling(true)) {
             ViewCompat.postInvalidateOnAnimation(this);
         }
     }
@@ -111,7 +111,7 @@ public class PullBackLayout extends FrameLayout{
         //这么做的目的是当图片缩小时应用会发生下标越界异常，
         // 接着捕捉异常返回false，子View可以继续处理事件分发，应用就不会crash了
         try {
-            return mDragHelper.shouldInterceptTouchEvent(ev);
+            return dragHelper.shouldInterceptTouchEvent(ev);
         }catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -120,7 +120,7 @@ public class PullBackLayout extends FrameLayout{
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        mDragHelper.processTouchEvent(event);
+        dragHelper.processTouchEvent(event);
         return true;
     }
 

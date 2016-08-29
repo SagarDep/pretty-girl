@@ -27,13 +27,13 @@ import rx.functions.Action1;
 public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder>
         implements Action1<List<Image>> {
 
-    private Context mContext;
-    private List<Image> mImages;
+    private Context context;
+    private List<Image> images;
     private OnTouchListener onTouchListener;
 
     public GirlAdapter(Context context, List<Image> images) {
-        this.mContext = context;
-        this.mImages = images;
+        this.context = context;
+        this.images = images;
     }
 
     public void setOnTouchListener(OnTouchListener onTouchListener) {
@@ -42,20 +42,20 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
 
     @Override
     public GirlViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        GirlViewHolder holder = new GirlViewHolder(LayoutInflater.from(mContext).inflate(
+        GirlViewHolder holder = new GirlViewHolder(LayoutInflater.from(context).inflate(
                 R.layout.girl_item, parent, false));
         return holder;
     }
 
     @Override
     public void onBindViewHolder(GirlViewHolder holder, int position) {
-        Image image = mImages.get(position);
+        Image image = images.get(position);
 
         holder.image = image;
         holder.binding.setImage(image);
         holder.binding.executePendingBindings();
 
-        Glide.with(mContext)
+        Glide.with(context)
                 .load(image.url)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.imageView);
@@ -63,13 +63,13 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
 
     @Override
     public int getItemViewType(int position) {
-        Image image = mImages.get(position);
+        Image image = images.get(position);
         return Math.round((float) image.width / (float) image.height * 10f);
     }
 
     @Override
     public int getItemCount() {
-        return mImages.size();
+        return images.size();
     }
 
     @Override
