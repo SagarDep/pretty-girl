@@ -14,9 +14,7 @@ import me.zsj.pretty_girl.module.GirlApiModule;
 public interface GirlApiComponent extends GirlGraph{
 
     final class Initializer {
-        private Initializer() {
-
-        }
+        private Initializer() {}
 
         public static GirlApiComponent init() {
             return DaggerGirlApiComponent.builder()

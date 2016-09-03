@@ -3,7 +3,6 @@ package me.zsj.pretty_girl.ui;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -12,6 +11,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.jakewharton.rxbinding.support.v4.widget.RxSwipeRefreshLayout;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
@@ -90,7 +90,7 @@ public class MainActivity extends RxAppCompatActivity {
                 .subscribe(aVoid -> {
                     page = 1;
                     refreshing = true;
-                    fetchGirlData(true);
+                    fetchGirlData();
                 });
     }
 
@@ -107,7 +107,7 @@ public class MainActivity extends RxAppCompatActivity {
 
         RxRecyclerView.scrollEvents(recyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindUntilEvent(ActivityEvent.DESTROY))
-                .filter(recyclerViewScrollEvent -> {
+                .map(scrollEvent -> {
                     boolean isBottom = false;
                     if (ConfigUtils.isOrientationPortrait(this)) {
                         isBottom = layoutManager.findLastCompletelyVisibleItemPositions(
@@ -116,8 +116,9 @@ public class MainActivity extends RxAppCompatActivity {
                         isBottom = layoutManager.findLastCompletelyVisibleItemPositions(
                                 new int[3])[2] >= mImages.size() - 4;
                     }
-                    return !refreshLayout.isRefreshing() && isBottom;
+                    return isBottom;
                 })
+                .filter(isBottom -> !refreshLayout.isRefreshing() && isBottom)
                 .subscribe(recyclerViewScrollEvent ->{
                     //这么做的目的是一旦下拉刷新，RxRecyclerView scrollEvents 也会被触发，page就会加一
                     //所以要将page设为0，这样下拉刷新才能获取第一页的数据
@@ -127,13 +128,13 @@ public class MainActivity extends RxAppCompatActivity {
                     }
                     page += 1;
                     refreshLayout.setRefreshing(true);
-                    fetchGirlData(false);
+                    fetchGirlData();
                 });
     }
 
     private void onImageClick() {
         girlAdapter.setOnTouchListener((v, image) ->
-                Picasso.with(MainActivity.this).load(image.url).fetch(new Callback() {
+                Picasso.with(this).load(image.url).fetch(new Callback() {
                     @Override
                     public void onSuccess() {
                         Intent intent = new Intent(MainActivity.this, PictureActivity.class);
@@ -153,14 +154,12 @@ public class MainActivity extends RxAppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         if (!NetUtils.checkNet(this)){
-            Snackbar.make(recyclerView, "无网络不能获取美女哦!", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("知道了", v -> {})
-                    .show();
+            Toast.makeText(this, "无网络不能获取美女哦!", Toast.LENGTH_SHORT).show();
         }
-        fetchGirlData(false);
+        fetchGirlData();
     }
 
-    private void fetchGirlData(final boolean clean) {
+    private void fetchGirlData() {
         Observable<List<Image>> results = girlApi.fetchPrettyGirl(page)
                 .compose(this.<Result<GirlData>>bindToLifecycle())
                 .filter(Results.isSuccess())
@@ -171,18 +170,14 @@ public class MainActivity extends RxAppCompatActivity {
                 .cache();
 
         results.filter(Results.isNull())
-                .doOnNext(images -> {
-                    if (clean) images.clear();
-                })
                 .doOnCompleted(() -> refreshLayout.setRefreshing(false))
                 .subscribe(girlAdapter, dataError);
     }
 
     private final Func1<GirlData, Observable<List<Image>>> imageFetcher = girlData -> {
-        List<PrettyGirl> results = girlData.results;
-        for (PrettyGirl girl : results) {
+        for (PrettyGirl girl : girlData.results) {
             try {
-                Bitmap bitmap = Picasso.with(MainActivity.this).load(girl.url)
+                Bitmap bitmap = Picasso.with(this).load(girl.url)
                         .get();
                 Image image = new Image();
                 image.width = bitmap.getWidth();
@@ -202,8 +197,7 @@ public class MainActivity extends RxAppCompatActivity {
         public void call(Throwable throwable) {
             throwable.printStackTrace();
             refreshLayout.setRefreshing(false);
-            Snackbar.make(recyclerView, throwable.getMessage(), Snackbar.LENGTH_LONG)
-                    .show();
+            Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
         }
     };
 
