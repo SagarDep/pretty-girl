@@ -6,9 +6,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.MemoryCategory;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.jakewharton.rxbinding.view.RxView;
 
@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import me.zsj.pretty_girl.R;
 import me.zsj.pretty_girl.databinding.GirlItemBinding;
 import me.zsj.pretty_girl.model.Image;
-import me.zsj.pretty_girl.widget.RatioImageView;
 import rx.functions.Action1;
 
 /**
@@ -32,6 +31,7 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
     private OnTouchListener onTouchListener;
 
     public GirlAdapter(Context context, List<Image> images) {
+        Glide.get(context).setMemoryCategory(MemoryCategory.HIGH);
         this.context = context;
         this.images = images;
     }
@@ -58,7 +58,7 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
         Glide.with(context)
                 .load(image.url)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.imageView);
+                .into(holder.binding.image);
     }
 
     @Override
@@ -78,23 +78,19 @@ public class GirlAdapter extends RecyclerView.Adapter<GirlAdapter.GirlViewHolder
     }
 
     class GirlViewHolder extends RecyclerView.ViewHolder {
-        FrameLayout girlLayout;
-        RatioImageView imageView;
-        GirlItemBinding binding;
 
+        GirlItemBinding binding;
         Image image;
 
         public GirlViewHolder(View itemView) {
             super(itemView);
-            imageView = (RatioImageView) itemView.findViewById(R.id.image);
-            girlLayout = (FrameLayout) itemView.findViewById(R.id.girl_layout);
             binding = DataBindingUtil.bind(itemView);
             //防止手抖连续点击图片打开多个页面
-            RxView.clicks(girlLayout)
+            RxView.clicks(binding.girlLayout)
                     .throttleFirst(1000, TimeUnit.MILLISECONDS)
                     .subscribe(aVoid -> {
                         if (onTouchListener != null) {
-                            onTouchListener.onImageClick(imageView, image);
+                            onTouchListener.onImageClick(binding.image, image);
                         }
                     });
         }

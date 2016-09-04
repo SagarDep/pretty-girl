@@ -1,5 +1,6 @@
 package me.zsj.pretty_girl.ui;
 
+import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -7,11 +8,11 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
 import me.zsj.pretty_girl.R;
+import me.zsj.pretty_girl.databinding.PictureActivityBinding;
 import me.zsj.pretty_girl.widget.PullBackLayout;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -26,24 +27,23 @@ public class PictureActivity extends AppCompatActivity implements PullBackLayout
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_picture);
-        ImageView meiziPhoto = (ImageView) findViewById(R.id.iv_photo);
-        PullBackLayout pullBackLayout = (PullBackLayout) findViewById(R.id.pullBackLayout);
+        PictureActivityBinding binding =
+                DataBindingUtil.setContentView(this, R.layout.picture_activity);
 
         String mGirlUrl = getIntent().getExtras().getString("url");
 
-        ViewCompat.setTransitionName(meiziPhoto, "girl");
+        ViewCompat.setTransitionName(binding.ivPhoto, "girl");
 
         Picasso.with(this).load(mGirlUrl)
-                .into(meiziPhoto);
+                .into(binding.ivPhoto);
 
         background = new ColorDrawable(Color.BLACK);
 
-        pullBackLayout.getRootView().setBackground(background);
+        binding.pullBackLayout.getRootView().setBackground(background);
 
-        PhotoViewAttacher mViewAttacher = new PhotoViewAttacher(meiziPhoto);
+        PhotoViewAttacher mViewAttacher = new PhotoViewAttacher(binding.ivPhoto);
 
-        pullBackLayout.setPullCallBack(this);
+        binding.pullBackLayout.setPullCallBack(this);
 
         mViewAttacher.setOnViewTapListener((view, x, y) -> {
             if (systemUiIsShow) {

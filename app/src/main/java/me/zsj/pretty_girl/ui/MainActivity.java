@@ -1,20 +1,17 @@
 package me.zsj.pretty_girl.ui;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.jakewharton.rxbinding.support.v4.widget.RxSwipeRefreshLayout;
-import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.squareup.picasso.Callback;
@@ -32,12 +29,12 @@ import me.zsj.pretty_girl.GirlApi;
 import me.zsj.pretty_girl.GirlApiComponent;
 import me.zsj.pretty_girl.R;
 import me.zsj.pretty_girl.Results;
+import me.zsj.pretty_girl.databinding.MainActivityBinding;
 import me.zsj.pretty_girl.model.GirlData;
 import me.zsj.pretty_girl.model.Image;
 import me.zsj.pretty_girl.model.PrettyGirl;
 import me.zsj.pretty_girl.utils.ConfigUtils;
 import me.zsj.pretty_girl.utils.NetUtils;
-import retrofit.Result;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -47,9 +44,7 @@ import rx.schedulers.Schedulers;
 
 public class MainActivity extends RxAppCompatActivity {
 
-    private SwipeRefreshLayout refreshLayout;
-    private RecyclerView recyclerView;
-    private Toolbar toolbar;
+    private MainActivityBinding binding;
 
     private GirlAdapter girlAdapter;
     private List<Image> mImages = new ArrayList<>();
@@ -58,15 +53,11 @@ public class MainActivity extends RxAppCompatActivity {
     private int page = 1;
     private boolean refreshing;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refreshLayout);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        binding = DataBindingUtil.setContentView(this, R.layout.main_activity);
+        setSupportActionBar(binding.toolbar);
 
         GirlApiComponent.Initializer.init().inject(this);
 
@@ -77,16 +68,16 @@ public class MainActivity extends RxAppCompatActivity {
     }
 
     private void flyToTop() {
-        RxView.clicks(toolbar)
-                .compose(this.bindToLifecycle())
+        RxView.clicks(binding.toolbar)
+                .compose(bindToLifecycle())
                 .subscribe(aVoid -> {
-                    recyclerView.smoothScrollToPosition(0);
+                    binding.recyclerView.smoothScrollToPosition(0);
                 });
     }
 
     private void swipeRefresh() {
-        RxSwipeRefreshLayout.refreshes(refreshLayout)
-                .compose(this.<Void>bindToLifecycle())
+        RxSwipeRefreshLayout.refreshes(binding.refreshLayout)
+                .compose(bindToLifecycle())
                 .subscribe(aVoid -> {
                     page = 1;
                     refreshing = true;
@@ -102,11 +93,11 @@ public class MainActivity extends RxAppCompatActivity {
 
         final StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(
                 spanCount, StaggeredGridLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(girlAdapter);
+        binding.recyclerView.setLayoutManager(layoutManager);
+        binding.recyclerView.setAdapter(girlAdapter);
 
-        RxRecyclerView.scrollEvents(recyclerView)
-                .compose(this.<RecyclerViewScrollEvent>bindUntilEvent(ActivityEvent.DESTROY))
+        RxRecyclerView.scrollEvents(binding.recyclerView)
+                .compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .map(scrollEvent -> {
                     boolean isBottom = false;
                     if (ConfigUtils.isOrientationPortrait(this)) {
@@ -118,7 +109,7 @@ public class MainActivity extends RxAppCompatActivity {
                     }
                     return isBottom;
                 })
-                .filter(isBottom -> !refreshLayout.isRefreshing() && isBottom)
+                .filter(isBottom -> !binding.refreshLayout.isRefreshing() && isBottom)
                 .subscribe(recyclerViewScrollEvent ->{
                     //这么做的目的是一旦下拉刷新，RxRecyclerView scrollEvents 也会被触发，page就会加一
                     //所以要将page设为0，这样下拉刷新才能获取第一页的数据
@@ -127,7 +118,7 @@ public class MainActivity extends RxAppCompatActivity {
                         refreshing = false;
                     }
                     page += 1;
-                    refreshLayout.setRefreshing(true);
+                    binding.refreshLayout.setRefreshing(true);
                     fetchGirlData();
                 });
     }
@@ -161,7 +152,7 @@ public class MainActivity extends RxAppCompatActivity {
 
     private void fetchGirlData() {
         Observable<List<Image>> results = girlApi.fetchPrettyGirl(page)
-                .compose(this.<Result<GirlData>>bindToLifecycle())
+                .compose(bindToLifecycle())
                 .filter(Results.isSuccess())
                 .map(girlDataResult -> girlDataResult.response().body())
                 .flatMap(imageFetcher)
@@ -170,7 +161,8 @@ public class MainActivity extends RxAppCompatActivity {
                 .cache();
 
         results.filter(Results.isNull())
-                .doOnCompleted(() -> refreshLayout.setRefreshing(false))
+                .compose(bindToLifecycle())
+                .doOnCompleted(() -> binding.refreshLayout.setRefreshing(false))
                 .subscribe(girlAdapter, dataError);
     }
 
@@ -196,7 +188,7 @@ public class MainActivity extends RxAppCompatActivity {
         @Override
         public void call(Throwable throwable) {
             throwable.printStackTrace();
-            refreshLayout.setRefreshing(false);
+            binding.refreshLayout.setRefreshing(false);
             Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
         }
     };
