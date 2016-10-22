@@ -1,12 +1,13 @@
 package me.zsj.pretty_girl;
 
-import com.squareup.okhttp.OkHttpClient;
 
 import java.util.concurrent.TimeUnit;
 
-import retrofit.GsonConverterFactory;
-import retrofit.Retrofit;
-import retrofit.RxJavaCallAdapterFactory;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 
 /**
  * Created by zsj on 2015/11/20 0020.
@@ -19,15 +20,15 @@ public class GirlRetrofit {
 
 
     public GirlRetrofit() {
-        OkHttpClient client = new OkHttpClient();
-        client.setConnectTimeout(20, TimeUnit.SECONDS);
-        client.setReadTimeout(15, TimeUnit.SECONDS);
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.connectTimeout(20, TimeUnit.SECONDS);
+        builder.readTimeout(15, TimeUnit.SECONDS);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(GANK_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .client(client)
+                .client(builder.build())
                 .build();
         girlApi = retrofit.create(GirlApi.class);
     }

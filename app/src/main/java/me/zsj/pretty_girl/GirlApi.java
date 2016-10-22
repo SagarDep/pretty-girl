@@ -1,9 +1,9 @@
 package me.zsj.pretty_girl;
 
 import me.zsj.pretty_girl.model.GirlData;
-import retrofit.Result;
-import retrofit.http.GET;
-import retrofit.http.Path;
+import retrofit2.adapter.rxjava.Result;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
 import rx.Observable;
 
 /**

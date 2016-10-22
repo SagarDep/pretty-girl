@@ -2,7 +2,7 @@ package me.zsj.pretty_girl;
 
 import java.util.List;
 
-import retrofit.Result;
+import retrofit2.adapter.rxjava.Result;
 import rx.functions.Func1;
 
 /**
@@ -11,7 +11,7 @@ import rx.functions.Func1;
 public class Results {
 
     public static Func1<Result<?>, Boolean> DATA_FUNC =
-            result -> !result.isError() && result.response().isSuccess();
+            result -> !result.isError() && result.response().isSuccessful();
 
     public static Func1<Result<?>, Boolean> isSuccess() {
         return DATA_FUNC;

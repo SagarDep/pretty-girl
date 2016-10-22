@@ -16,7 +16,7 @@
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
         android:background="@android:color/white"
-        android:foreground="?attr/selectableItemBackground">
+        android:foreground="?selectableItemBackgroundBorderless">
 
         <me.zsj.pretty_girl.widget.RatioImageView
             android:id="@+id/image"
