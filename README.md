@@ -1,7 +1,12 @@
 # pretty-girl
 ###一个收集妹纸图片的App，并且用了比较多的Rx库写
+
 ###开发目的
 为了学习DataBinding, RxJava, RxBinding, Retrofit 2.0等知识,参考了[mr-mantou-android](https://github.com/oxoooo/mr-mantou-android)。
+
+###Kotlin 版本
+https://github.com/Assassinss/pretty-girl-kotlin
+
 ###截图
 <img src="/screenshots/device-2016-08-02-183743.png" width="274" height="489">
 <img src="/screenshots/device-2016-08-02-183924.png" width="274" height="489">
